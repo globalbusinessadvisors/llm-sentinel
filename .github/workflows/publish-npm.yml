@@ -45,21 +45,14 @@ jobs:
         with:
           targets: ${{ matrix.target }}
 
-      - name: Setup vcpkg and librdkafka for Windows
+      - name: Install CMake for Windows
         if: matrix.platform == 'win32-x64'
-        run: |
-          choco install -y pkgconfiglite
-          git clone https://github.com/microsoft/vcpkg
-          .\vcpkg\bootstrap-vcpkg.bat
-          .\vcpkg\vcpkg install librdkafka:x64-windows
+        run: choco install -y cmake
         shell: pwsh
 
       - name: Build binary (Windows)
         if: matrix.platform == 'win32-x64'
         run: cargo build --release --target ${{ matrix.target }} --bin sentinel
-        env:
-          VCPKG_ROOT: ${{ github.workspace }}\vcpkg
-          PKG_CONFIG_PATH: ${{ github.workspace }}\vcpkg\installed\x64-windows\lib\pkgconfig
 
       - name: Build binary (Unix)
         if: matrix.platform != 'win32-x64'
