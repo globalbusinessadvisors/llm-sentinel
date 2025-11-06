@@ -6,7 +6,7 @@ members = [
     "crates/sentinel-storage",
     "crates/sentinel-api",
     "crates/sentinel-alerting",
-    "llm-sentinel",
+    "sentinel",
 ]
 resolver = "2"
 
