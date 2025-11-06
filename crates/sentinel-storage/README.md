@@ -1,4 +1,4 @@
-# sentinel-storage
+# llm-sentinel-storage
 
 InfluxDB time-series storage and multi-layer caching for LLM-Sentinel.
 
@@ -26,7 +26,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-sentinel-storage = "0.1.0"
+llm-sentinel-storage = "0.1.0"
 ```
 
 ## Example

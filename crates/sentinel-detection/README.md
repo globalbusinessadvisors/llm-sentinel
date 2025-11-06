@@ -1,4 +1,4 @@
-# sentinel-detection
+# llm-sentinel-detection
 
 Multi-algorithm anomaly detection engine for LLM telemetry data.
 
@@ -26,7 +26,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-sentinel-detection = "0.1.0"
+llm-sentinel-detection = "0.1.0"
 ```
 
 ## Example

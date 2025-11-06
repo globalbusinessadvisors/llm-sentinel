@@ -1,4 +1,4 @@
-# sentinel-ingestion
+# llm-sentinel-ingestion
 
 Kafka ingestion, OTLP parsing, and telemetry validation for LLM-Sentinel.
 
@@ -26,7 +26,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-sentinel-ingestion = "0.1.0"
+llm-sentinel-ingestion = "0.1.0"
 ```
 
 ## Example

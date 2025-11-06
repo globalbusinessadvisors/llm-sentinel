@@ -1,4 +1,4 @@
-# sentinel-api
+# llm-sentinel-api
 
 REST API server with health checks, metrics, and query endpoints for LLM-Sentinel.
 
@@ -24,7 +24,7 @@ Production-ready REST API built with Axum:
 
 ```toml
 [dependencies]
-sentinel-api = "0.1.0"
+llm-sentinel-api = "0.1.0"
 ```
 
 ## Example

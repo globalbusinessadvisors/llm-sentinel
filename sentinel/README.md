@@ -15,7 +15,7 @@ The sentinel binary orchestrates all system components:
 ## Installation
 
 ```bash
-cargo install sentinel
+cargo install llm-sentinel
 ```
 
 Or build from source:

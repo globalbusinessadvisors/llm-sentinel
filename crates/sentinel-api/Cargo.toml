@@ -1,5 +1,5 @@
 [package]
-name = "sentinel-api"
+name = "llm-sentinel-api"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
@@ -14,9 +14,9 @@ readme = "README.md"
 
 [dependencies]
 # Internal
-sentinel-core = { path = "../sentinel-core" }
-sentinel-storage = { path = "../sentinel-storage" }
-sentinel-detection = { path = "../sentinel-detection" }
+llm-sentinel-core = { path = "../sentinel-core" }
+llm-sentinel-storage = { path = "../sentinel-storage" }
+llm-sentinel-detection = { path = "../sentinel-detection" }
 
 # Async
 tokio = { workspace = true }

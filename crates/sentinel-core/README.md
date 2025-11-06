@@ -1,4 +1,4 @@
-# sentinel-core
+# llm-sentinel-core
 
 Core types, error handling, and configuration for LLM-Sentinel anomaly detection system.
 
@@ -26,7 +26,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-sentinel-core = "0.1.0"
+llm-sentinel-core = "0.1.0"
 ```
 
 ## Example
@@ -49,7 +49,7 @@ let event = TelemetryEvent::new(
 
 ## Documentation
 
-For complete documentation, see [docs.rs/sentinel-core](https://docs.rs/sentinel-core).
+For complete documentation, see [docs.rs/llm-sentinel-core](https://docs.rs/llm-sentinel-core).
 
 ## License
 

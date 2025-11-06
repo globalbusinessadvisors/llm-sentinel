@@ -1,5 +1,5 @@
 [package]
-name = "sentinel-core"
+name = "llm-sentinel-core"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true

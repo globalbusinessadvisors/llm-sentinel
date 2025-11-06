@@ -1,5 +1,5 @@
 [package]
-name = "sentinel-alerting"
+name = "llm-sentinel-alerting"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
@@ -14,7 +14,7 @@ readme = "README.md"
 
 [dependencies]
 # Internal
-sentinel-core = { path = "../sentinel-core" }
+llm-sentinel-core = { path = "../sentinel-core" }
 
 # Async
 tokio = { workspace = true }

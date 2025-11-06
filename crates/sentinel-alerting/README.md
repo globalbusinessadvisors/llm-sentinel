@@ -1,4 +1,4 @@
-# sentinel-alerting
+# llm-sentinel-alerting
 
 RabbitMQ and webhook alerting with deduplication for LLM-Sentinel.
 
@@ -24,7 +24,7 @@ Flexible alerting system with multiple delivery channels:
 
 ```toml
 [dependencies]
-sentinel-alerting = "0.1.0"
+llm-sentinel-alerting = "0.1.0"
 ```
 
 ## Example
