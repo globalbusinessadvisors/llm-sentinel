@@ -14,7 +14,7 @@ readme = "README.md"
 
 [dependencies]
 # Internal
-llm-sentinel-core = { path = "../sentinel-core" }
+llm-sentinel-core = { version = "0.1.0", path = "../sentinel-core" }
 
 # Async
 tokio = { workspace = true }

@@ -18,12 +18,12 @@ path = "src/main.rs"
 
 [dependencies]
 # Internal crates
-llm-sentinel-core = { path = "../crates/sentinel-core" }
-llm-sentinel-ingestion = { path = "../crates/sentinel-ingestion" }
-llm-sentinel-detection = { path = "../crates/sentinel-detection" }
-llm-sentinel-storage = { path = "../crates/sentinel-storage" }
-llm-sentinel-alerting = { path = "../crates/sentinel-alerting" }
-llm-sentinel-api = { path = "../crates/sentinel-api" }
+llm-sentinel-core = { version = "0.1.0", path = "../crates/sentinel-core" }
+llm-sentinel-ingestion = { version = "0.1.0", path = "../crates/sentinel-ingestion" }
+llm-sentinel-detection = { version = "0.1.0", path = "../crates/sentinel-detection" }
+llm-sentinel-storage = { version = "0.1.0", path = "../crates/sentinel-storage" }
+llm-sentinel-alerting = { version = "0.1.0", path = "../crates/sentinel-alerting" }
+llm-sentinel-api = { version = "0.1.0", path = "../crates/sentinel-api" }
 
 # Async
 tokio = { workspace = true }
