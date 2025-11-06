@@ -45,7 +45,7 @@ datafusion = "44.0"
 arrow = "54.0"
 
 # Database & Storage
-influxdb2 = { version = "0.5", features = ["reqwest"] }
+influxdb2 = "0.5"
 moka = { version = "0.12", features = ["future"] }
 redis = { version = "0.27", features = ["tokio-comp", "cluster-async"] }
 
