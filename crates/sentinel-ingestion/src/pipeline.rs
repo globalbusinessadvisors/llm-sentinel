@@ -39,10 +39,24 @@ impl Default for PipelineConfig {
 pub struct IngestionPipeline {
     config: PipelineConfig,
     validator: Arc<EventValidator>,
+    #[allow(dead_code)]
     parser: Arc<OtlpParser>,
     tx: Option<UnboundedSender<TelemetryEvent>>,
     rx: Option<UnboundedReceiver<TelemetryEvent>>,
     worker_handles: Vec<JoinHandle<()>>,
+}
+
+impl std::fmt::Debug for IngestionPipeline {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("IngestionPipeline")
+            .field("config", &self.config)
+            .field("validator", &self.validator)
+            .field("parser", &self.parser)
+            .field("tx", &self.tx.is_some())
+            .field("rx", &self.rx.is_some())
+            .field("worker_handles", &self.worker_handles.len())
+            .finish()
+    }
 }
 
 impl IngestionPipeline {

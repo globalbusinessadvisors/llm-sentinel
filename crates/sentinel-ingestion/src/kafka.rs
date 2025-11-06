@@ -24,6 +24,17 @@ pub struct KafkaIngester {
     running: bool,
 }
 
+impl std::fmt::Debug for KafkaIngester {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("KafkaIngester")
+            .field("topic", &self.topic)
+            .field("batch_size", &self.batch_size)
+            .field("batch_timeout", &self.batch_timeout)
+            .field("running", &self.running)
+            .finish()
+    }
+}
+
 impl KafkaIngester {
     /// Create a new Kafka ingester
     pub fn new(config: &KafkaConfig, batch_size: usize, batch_timeout_ms: u64) -> Result<Self> {
