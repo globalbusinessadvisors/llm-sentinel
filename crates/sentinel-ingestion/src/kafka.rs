@@ -12,10 +12,10 @@ use llm_sentinel_core::{
     Error, Result,
 };
 use std::time::Duration;
-use tracing::{debug, error, info, warn};
+use tracing::{debug, error, info};
+use validator::Validate;
 
 /// Kafka-based telemetry ingester
-#[derive(Debug)]
 pub struct KafkaIngester {
     consumer: StreamConsumer,
     topic: String,

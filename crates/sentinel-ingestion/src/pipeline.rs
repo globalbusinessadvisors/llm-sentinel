@@ -1,15 +1,15 @@
 //! Ingestion pipeline orchestration.
 
-use crate::{Ingester, otlp::OtlpParser, validation::EventValidator};
-use crossfire::mpsc::{TxFuture, RxFuture};
+use crate::{otlp::OtlpParser, validation::EventValidator};
 use llm_sentinel_core::{
-    config::IngestionConfig,
     events::TelemetryEvent,
     Result, Error,
 };
 use std::sync::Arc;
+use tokio::sync::mpsc::{UnboundedSender, UnboundedReceiver};
+use tokio::sync::Mutex;
 use tokio::task::JoinHandle;
-use tracing::{debug, error, info, warn};
+use tracing::{debug, error, info};
 
 /// Pipeline configuration
 #[derive(Debug, Clone)]
@@ -40,15 +40,15 @@ pub struct IngestionPipeline {
     config: PipelineConfig,
     validator: Arc<EventValidator>,
     parser: Arc<OtlpParser>,
-    tx: Option<TxFuture<TelemetryEvent>>,
-    rx: Option<RxFuture<TelemetryEvent>>,
+    tx: Option<UnboundedSender<TelemetryEvent>>,
+    rx: Option<UnboundedReceiver<TelemetryEvent>>,
     worker_handles: Vec<JoinHandle<()>>,
 }
 
 impl IngestionPipeline {
     /// Create a new ingestion pipeline
     pub fn new(config: PipelineConfig) -> Self {
-        let (tx, rx) = crossfire::mpsc::unbounded_tx_future_rx();
+        let (tx, rx) = tokio::sync::mpsc::unbounded_channel();
 
         Self {
             config,
@@ -61,7 +61,7 @@ impl IngestionPipeline {
     }
 
     /// Get a sender for pushing events into the pipeline
-    pub fn sender(&self) -> Result<TxFuture<TelemetryEvent>> {
+    pub fn sender(&self) -> Result<UnboundedSender<TelemetryEvent>> {
         self.tx
             .as_ref()
             .map(|tx| tx.clone())
@@ -69,7 +69,7 @@ impl IngestionPipeline {
     }
 
     /// Get a receiver for consuming processed events
-    pub fn receiver(&mut self) -> Result<RxFuture<TelemetryEvent>> {
+    pub fn receiver(&mut self) -> Result<UnboundedReceiver<TelemetryEvent>> {
         self.rx
             .take()
             .ok_or_else(|| Error::internal("Pipeline receiver already taken"))
@@ -80,10 +80,11 @@ impl IngestionPipeline {
         info!("Starting ingestion pipeline with {} workers", self.config.workers);
 
         let rx = self.receiver()?;
+        let rx_shared = Arc::new(Mutex::new(rx));
 
         // Spawn worker tasks
         for worker_id in 0..self.config.workers {
-            let rx_clone = rx.clone();
+            let rx_clone = Arc::clone(&rx_shared);
             let validator = Arc::clone(&self.validator);
             let enable_validation = self.config.enable_validation;
             let enable_sanitization = self.config.enable_sanitization;
@@ -109,7 +110,7 @@ impl IngestionPipeline {
     /// Worker task for processing events
     async fn worker_task(
         worker_id: usize,
-        mut rx: RxFuture<TelemetryEvent>,
+        rx: Arc<Mutex<UnboundedReceiver<TelemetryEvent>>>,
         validator: Arc<EventValidator>,
         enable_validation: bool,
         enable_sanitization: bool,
@@ -117,8 +118,13 @@ impl IngestionPipeline {
         debug!("Worker {} started", worker_id);
 
         loop {
-            match rx.recv().await {
-                Ok(mut event) => {
+            let event_opt = {
+                let mut rx_lock = rx.lock().await;
+                rx_lock.recv().await
+            };
+
+            match event_opt {
+                Some(mut event) => {
                     // Validate event
                     if enable_validation {
                         if let Err(e) = validator.validate(&event) {
@@ -159,8 +165,8 @@ impl IngestionPipeline {
                     // Event is ready for detection pipeline
                     // In a full implementation, this would forward to detection engine
                 }
-                Err(e) => {
-                    error!(worker_id, "Worker receive error: {}", e);
+                None => {
+                    debug!(worker_id, "Channel closed, worker shutting down");
                     break;
                 }
             }

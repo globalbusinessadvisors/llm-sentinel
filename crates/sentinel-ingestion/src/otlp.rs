@@ -34,6 +34,10 @@ impl OtlpParser {
     ///
     /// OTLP spans contain LLM request/response data as attributes
     pub fn parse_span(&self, span_data: &Value) -> Result<TelemetryEvent> {
+        let span_obj = span_data
+            .as_object()
+            .ok_or_else(|| Error::ingestion("Span data is not an object"))?;
+
         let attributes = span_data
             .get("attributes")
             .and_then(|v| v.as_object())
@@ -50,8 +54,8 @@ impl OtlpParser {
             .ok_or_else(|| Error::ingestion("Missing llm.model attribute"))?;
 
         // Extract trace and span IDs
-        let trace_id = self.extract_string(span_data, "trace_id");
-        let span_id = self.extract_string(span_data, "span_id");
+        let trace_id = self.extract_string(span_obj, "trace_id");
+        let span_id = self.extract_string(span_obj, "span_id");
 
         // Extract prompt
         let prompt_text = self
@@ -59,7 +63,7 @@ impl OtlpParser {
             .ok_or_else(|| Error::ingestion("Missing llm.prompt attribute"))?;
         let prompt_tokens = self
             .extract_number(attributes, "llm.prompt.tokens")
-            .unwrap_or(0) as u32;
+            .unwrap_or(0.0) as u32;
         let prompt_embedding = self.extract_embedding(attributes, "llm.prompt.embedding");
 
         // Extract response
@@ -68,7 +72,7 @@ impl OtlpParser {
             .ok_or_else(|| Error::ingestion("Missing llm.response attribute"))?;
         let response_tokens = self
             .extract_number(attributes, "llm.response.tokens")
-            .unwrap_or(0) as u32;
+            .unwrap_or(0.0) as u32;
         let finish_reason = self
             .extract_string(attributes, "llm.response.finish_reason")
             .unwrap_or_else(|| "unknown".to_string());

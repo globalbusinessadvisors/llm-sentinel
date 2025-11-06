@@ -20,7 +20,6 @@ llm-sentinel-core = { version = "0.1.0", path = "../sentinel-core" }
 tokio = { workspace = true }
 async-trait = { workspace = true }
 futures = { workspace = true }
-crossfire = { workspace = true }
 
 # Message Queue
 rdkafka = { workspace = true }
