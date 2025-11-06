@@ -41,8 +41,7 @@
   "optionalDependencies": {
     "@llm-dev-ops/sentinel-cli-darwin-x64": "0.1.2",
     "@llm-dev-ops/sentinel-cli-darwin-arm64": "0.1.2",
-    "@llm-dev-ops/sentinel-cli-linux-x64": "0.1.2",
-    "@llm-dev-ops/sentinel-cli-win32-x64": "0.1.2"
+    "@llm-dev-ops/sentinel-cli-linux-x64": "0.1.2"
   },
   "devDependencies": {},
   "publishConfig": {

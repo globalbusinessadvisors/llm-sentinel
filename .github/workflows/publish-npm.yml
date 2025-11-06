@@ -29,10 +29,6 @@ jobs:
             platform: darwin-x64
             target: x86_64-apple-darwin
             binary: sentinel
-          - os: windows-latest
-            platform: win32-x64
-            target: x86_64-pc-windows-msvc
-            binary: sentinel.exe
 
     runs-on: ${{ matrix.os }}
 
@@ -148,8 +144,7 @@ jobs:
             "optionalDependencies": {
               "@llm-dev-ops/sentinel-cli-darwin-x64": "${{ github.event.inputs.version }}",
               "@llm-dev-ops/sentinel-cli-darwin-arm64": "${{ github.event.inputs.version }}",
-              "@llm-dev-ops/sentinel-cli-linux-x64": "${{ github.event.inputs.version }}",
-              "@llm-dev-ops/sentinel-cli-win32-x64": "${{ github.event.inputs.version }}"
+              "@llm-dev-ops/sentinel-cli-linux-x64": "${{ github.event.inputs.version }}"
             },
             "publishConfig": {
               "access": "public"
