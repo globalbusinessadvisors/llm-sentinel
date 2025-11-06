@@ -60,7 +60,7 @@ impl KafkaIngester {
     }
 
     /// Parse Kafka message to telemetry event
-    fn parse_message(&self, message: &rdkafka::message::BorrowedMessage) -> Result<TelemetryEvent> {
+    fn parse_message(&self, message: &rdkafka::message::BorrowedMessage<'_>) -> Result<TelemetryEvent> {
         let payload = message
             .payload()
             .ok_or_else(|| Error::ingestion("Empty message payload"))?;

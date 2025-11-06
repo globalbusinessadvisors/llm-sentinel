@@ -9,7 +9,7 @@ use std::sync::Arc;
 use tokio::sync::mpsc::{UnboundedSender, UnboundedReceiver};
 use tokio::sync::Mutex;
 use tokio::task::JoinHandle;
-use tracing::{debug, error, info};
+use tracing::{debug, error, info, warn};
 
 /// Pipeline configuration
 #[derive(Debug, Clone)]
