@@ -1,0 +1,118 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "sentinel.fullname" . }}
+  labels:
+    {{- include "sentinel.labels" . | nindent 4 }}
+data:
+  sentinel.yaml: |
+    ingestion:
+      kafka:
+        brokers: {{ .Values.config.ingestion.kafka.brokers | toYaml | nindent 10 }}
+        topic: {{ .Values.config.ingestion.kafka.topic | quote }}
+        groupId: {{ .Values.config.ingestion.kafka.groupId | quote }}
+        sessionTimeoutMs: {{ .Values.config.ingestion.kafka.sessionTimeoutMs }}
+        enableAutoCommit: {{ .Values.config.ingestion.kafka.enableAutoCommit }}
+        autoOffsetReset: {{ .Values.config.ingestion.kafka.autoOffsetReset | quote }}
+        maxPollRecords: {{ .Values.config.ingestion.kafka.maxPollRecords }}
+
+      parsing:
+        maxTextLength: {{ .Values.config.ingestion.parsing.maxTextLength }}
+        enableSanitization: {{ .Values.config.ingestion.parsing.enableSanitization }}
+        sanitizePatterns: {{ .Values.config.ingestion.parsing.sanitizePatterns | toYaml | nindent 10 }}
+
+      validation:
+        minLatencyMs: {{ .Values.config.ingestion.validation.minLatencyMs }}
+        maxLatencyMs: {{ .Values.config.ingestion.validation.maxLatencyMs }}
+        maxTokens: {{ .Values.config.ingestion.validation.maxTokens }}
+        maxCostUsd: {{ .Values.config.ingestion.validation.maxCostUsd }}
+        enablePiiDetection: {{ .Values.config.ingestion.validation.enablePiiDetection }}
+
+    detection:
+      enabledDetectors: {{ .Values.config.detection.enabledDetectors | toYaml | nindent 8 }}
+
+      baseline:
+        windowSize: {{ .Values.config.detection.baseline.windowSize }}
+        minSamples: {{ .Values.config.detection.baseline.minSamples }}
+        updateIntervalSecs: {{ .Values.config.detection.baseline.updateIntervalSecs }}
+        enablePersistence: {{ .Values.config.detection.baseline.enablePersistence }}
+        persistencePath: {{ .Values.config.detection.baseline.persistencePath | quote }}
+
+      zscore:
+        threshold: {{ .Values.config.detection.zscore.threshold }}
+        sensitivity: {{ .Values.config.detection.zscore.sensitivity | quote }}
+        metrics: {{ .Values.config.detection.zscore.metrics | toYaml | nindent 10 }}
+
+      iqr:
+        multiplier: {{ .Values.config.detection.iqr.multiplier }}
+        metrics: {{ .Values.config.detection.iqr.metrics | toYaml | nindent 10 }}
+
+      mad:
+        threshold: {{ .Values.config.detection.mad.threshold }}
+        metrics: {{ .Values.config.detection.mad.metrics | toYaml | nindent 10 }}
+
+      cusum:
+        threshold: {{ .Values.config.detection.cusum.threshold }}
+        drift: {{ .Values.config.detection.cusum.drift }}
+        metrics: {{ .Values.config.detection.cusum.metrics | toYaml | nindent 10 }}
+
+    storage:
+      influxdb:
+        url: {{ .Values.config.storage.influxdb.url | quote }}
+        org: {{ .Values.config.storage.influxdb.org | quote }}
+        telemetryBucket: {{ .Values.config.storage.influxdb.telemetryBucket | quote }}
+        anomalyBucket: {{ .Values.config.storage.influxdb.anomalyBucket | quote }}
+        batchSize: {{ .Values.config.storage.influxdb.batchSize }}
+        timeoutSecs: {{ .Values.config.storage.influxdb.timeoutSecs }}
+
+      cache:
+        maxCapacity: {{ .Values.config.storage.cache.maxCapacity }}
+        ttlSecs: {{ .Values.config.storage.cache.ttlSecs }}
+        ttiSecs: {{ .Values.config.storage.cache.ttiSecs }}
+        enableMetrics: {{ .Values.config.storage.cache.enableMetrics }}
+
+      {{- if .Values.config.storage.redis.enabled }}
+      redis:
+        enabled: {{ .Values.config.storage.redis.enabled }}
+        url: {{ .Values.config.storage.redis.url | quote }}
+        keyPrefix: {{ .Values.config.storage.redis.keyPrefix | quote }}
+        ttlSecs: {{ .Values.config.storage.redis.ttlSecs }}
+      {{- end }}
+
+    alerting:
+      rabbitmq:
+        url: {{ .Values.config.alerting.rabbitmq.url | quote }}
+        exchange: {{ .Values.config.alerting.rabbitmq.exchange | quote }}
+        exchangeType: {{ .Values.config.alerting.rabbitmq.exchangeType | quote }}
+        routingKeyPrefix: {{ .Values.config.alerting.rabbitmq.routingKeyPrefix | quote }}
+        persistent: {{ .Values.config.alerting.rabbitmq.persistent }}
+        timeoutSecs: {{ .Values.config.alerting.rabbitmq.timeoutSecs }}
+        retryConfig:
+          maxAttempts: {{ .Values.config.alerting.rabbitmq.retryConfig.maxAttempts }}
+          initialDelayMs: {{ .Values.config.alerting.rabbitmq.retryConfig.initialDelayMs }}
+          backoffMultiplier: {{ .Values.config.alerting.rabbitmq.retryConfig.backoffMultiplier }}
+          maxDelayMs: {{ .Values.config.alerting.rabbitmq.retryConfig.maxDelayMs }}
+
+      {{- if .Values.config.alerting.webhook.enabled }}
+      webhook:
+        enabled: {{ .Values.config.alerting.webhook.enabled }}
+        method: {{ .Values.config.alerting.webhook.method | quote }}
+        timeoutSecs: {{ .Values.config.alerting.webhook.timeoutSecs }}
+        maxRetries: {{ .Values.config.alerting.webhook.maxRetries }}
+        retryDelayMs: {{ .Values.config.alerting.webhook.retryDelayMs }}
+        backoffMultiplier: {{ .Values.config.alerting.webhook.backoffMultiplier }}
+      {{- end }}
+
+      deduplication:
+        enabled: {{ .Values.config.alerting.deduplication.enabled }}
+        windowSecs: {{ .Values.config.alerting.deduplication.windowSecs }}
+        cleanupIntervalSecs: {{ .Values.config.alerting.deduplication.cleanupIntervalSecs }}
+
+    api:
+      bindAddr: {{ .Values.config.api.bindAddr | quote }}
+      enableCors: {{ .Values.config.api.enableCors }}
+      corsOrigins: {{ .Values.config.api.corsOrigins | toYaml | nindent 8 }}
+      timeoutSecs: {{ .Values.config.api.timeoutSecs }}
+      maxBodySize: {{ .Values.config.api.maxBodySize }}
+      enableLogging: {{ .Values.config.api.enableLogging }}
+      metricsPath: {{ .Values.config.api.metricsPath | quote }}

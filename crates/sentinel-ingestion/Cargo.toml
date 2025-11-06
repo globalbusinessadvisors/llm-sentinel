@@ -1,0 +1,53 @@
+[package]
+name = "sentinel-ingestion"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+
+[dependencies]
+# Internal
+sentinel-core = { path = "../sentinel-core" }
+
+# Async
+tokio = { workspace = true }
+async-trait = { workspace = true }
+futures = { workspace = true }
+crossfire = { workspace = true }
+
+# Message Queue
+rdkafka = { workspace = true }
+
+# Serialization
+serde = { workspace = true }
+serde_json = { workspace = true }
+bytes = { workspace = true }
+
+# gRPC & Proto
+tonic = { workspace = true }
+prost = { workspace = true }
+
+# Error Handling
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+
+# Observability
+tracing = { workspace = true }
+metrics = { workspace = true }
+
+# Validation
+validator = { workspace = true }
+
+# Time
+chrono = { workspace = true }
+uuid = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["test-util", "macros"] }
+mockall = { workspace = true }
+
+[build-dependencies]
+tonic-build = "0.12"

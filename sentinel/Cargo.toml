@@ -1,0 +1,52 @@
+[package]
+name = "sentinel"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+
+[[bin]]
+name = "sentinel"
+path = "src/main.rs"
+
+[dependencies]
+# Internal crates
+sentinel-core = { path = "../crates/sentinel-core" }
+sentinel-ingestion = { path = "../crates/sentinel-ingestion" }
+sentinel-detection = { path = "../crates/sentinel-detection" }
+sentinel-storage = { path = "../crates/sentinel-storage" }
+sentinel-alerting = { path = "../crates/sentinel-alerting" }
+sentinel-api = { path = "../crates/sentinel-api" }
+
+# Async
+tokio = { workspace = true }
+async-trait = { workspace = true }
+futures = { workspace = true }
+
+# Configuration
+clap = { workspace = true }
+figment = { workspace = true }
+
+# Serialization
+serde = { workspace = true }
+serde_json = { workspace = true }
+serde_yaml = { workspace = true }
+
+# Error Handling
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+
+# Observability
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+metrics = { workspace = true }
+
+# Utilities
+once_cell = { workspace = true }
+dashmap = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["test-util", "macros"] }

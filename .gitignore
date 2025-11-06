@@ -1,0 +1,114 @@
+# Rust build artifacts
+/target/
+**/*.rs.bk
+*.pdb
+Cargo.lock
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.iml
+.claude-flow/
+
+# Node.js (if accidentally added)
+node_modules/
+package-lock.json
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Local configuration
+config/*-local.yaml
+config/*.local.yaml
+*.local.yaml
+
+# Logs
+*.log
+logs/
+/var/log/sentinel/
+
+# Data directories
+/var/lib/sentinel/
+baselines/
+data/
+
+# Coverage reports
+tarpaulin-report.html
+cobertura.xml
+lcov.info
+coverage/
+
+# Profiling
+perf.data
+perf.data.old
+flamegraph.svg
+
+# Benchmarks
+criterion/
+
+# Testing
+.hypothesis/
+
+# Documentation build
+target/doc/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.swp
+
+# MacOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Docker
+.docker/
+
+# Kubernetes
+kubeconfig
+*.kubeconfig
+
+# Secrets
+secrets.yaml
+*-secrets.yaml
+*.key
+*.pem
+*.crt
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Editor-specific
+.*.sw[a-z]
+.netrwhist
+
+# Debug files
+debug/
+*.dSYM/
+
+# Profiling
+*.prof
+
+# CI/CD
+.github/workflows/*.tmp

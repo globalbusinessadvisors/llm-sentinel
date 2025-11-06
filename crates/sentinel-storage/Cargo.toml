@@ -1,0 +1,46 @@
+[package]
+name = "sentinel-storage"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+
+[dependencies]
+# Internal
+sentinel-core = { path = "../sentinel-core" }
+
+# Async
+tokio = { workspace = true }
+async-trait = { workspace = true }
+
+# Database
+influxdb2 = { workspace = true }
+
+# Cache
+moka = { workspace = true }
+redis = { workspace = true }
+
+# Serialization
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+# Error Handling
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+
+# Observability
+tracing = { workspace = true }
+metrics = { workspace = true }
+
+# Time
+chrono = { workspace = true }
+
+# Utilities
+once_cell = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["test-util", "macros"] }
+mockall = { workspace = true }

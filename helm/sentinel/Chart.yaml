@@ -1,0 +1,19 @@
+apiVersion: v2
+name: sentinel
+description: LLM-Sentinel - Enterprise-grade anomaly detection for LLM applications
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+keywords:
+  - llm
+  - anomaly-detection
+  - observability
+  - monitoring
+  - rust
+home: https://github.com/llm-devops/llm-sentinel
+sources:
+  - https://github.com/llm-devops/llm-sentinel
+maintainers:
+  - name: LLM DevOps Team
+    email: support@llm-devops.io
+icon: https://llm-devops.io/sentinel/icon.png

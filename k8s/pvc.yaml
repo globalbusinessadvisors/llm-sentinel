@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: sentinel-baselines
+  namespace: sentinel
+  labels:
+    app: sentinel
+    app.kubernetes.io/name: sentinel
+    app.kubernetes.io/component: storage
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: standard  # Change based on your cluster
+  resources:
+    requests:
+      storage: 10Gi
+  # Optional: Use volumeMode: Filesystem (default)
+  volumeMode: Filesystem

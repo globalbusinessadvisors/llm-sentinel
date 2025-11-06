@@ -1,0 +1,51 @@
+[package]
+name = "sentinel-alerting"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+
+[dependencies]
+# Internal
+sentinel-core = { path = "../sentinel-core" }
+
+# Async
+tokio = { workspace = true }
+async-trait = { workspace = true }
+
+# Messaging
+lapin = "2.5"
+amqp-client = "0.3"
+
+# HTTP Client
+reqwest = { workspace = true }
+
+# Serialization
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+# Error Handling
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+
+# Observability
+tracing = { workspace = true }
+metrics = { workspace = true }
+
+# Time
+chrono = { workspace = true }
+
+# Utilities
+uuid = { workspace = true }
+once_cell = { workspace = true }
+
+# Collections
+dashmap = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["test-util", "macros"] }
+mockall = { workspace = true }
+wiremock = "0.6"

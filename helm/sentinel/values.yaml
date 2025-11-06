@@ -1,0 +1,410 @@
+# Default values for sentinel
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+## Number of replicas
+replicaCount: 3
+
+## Sentinel image configuration
+image:
+  repository: ghcr.io/llm-devops/sentinel
+  pullPolicy: IfNotPresent
+  tag: "0.1.0"
+
+## Image pull secrets
+imagePullSecrets: []
+
+## String to partially override sentinel.fullname
+nameOverride: ""
+fullnameOverride: ""
+
+## Service Account
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+## Pod annotations
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "8080"
+  prometheus.io/path: "/metrics"
+
+## Pod security context
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 1000
+  seccompProfile:
+    type: RuntimeDefault
+
+## Container security context
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1000
+  capabilities:
+    drop:
+      - ALL
+
+## Service configuration
+service:
+  type: ClusterIP
+  port: 8080
+  metricsPort: 9090
+  annotations: {}
+
+## Ingress configuration
+ingress:
+  enabled: false
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  hosts:
+    - host: sentinel.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: sentinel-tls
+      hosts:
+        - sentinel.example.com
+
+## Resource limits and requests
+resources:
+  limits:
+    cpu: 2000m
+    memory: 2Gi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+## Horizontal Pod Autoscaler
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+## Pod Disruption Budget
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 2
+
+## Probes configuration
+livenessProbe:
+  httpGet:
+    path: /health/live
+    port: http
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /health/ready
+    port: http
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+startupProbe:
+  httpGet:
+    path: /health/live
+    port: http
+  initialDelaySeconds: 0
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 30
+
+## Node selector
+nodeSelector: {}
+
+## Tolerations
+tolerations: []
+
+## Affinity and anti-affinity
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                  - sentinel
+          topologyKey: kubernetes.io/hostname
+
+## Topology spread constraints
+topologySpreadConstraints:
+  - maxSkew: 1
+    topologyKey: topology.kubernetes.io/zone
+    whenUnsatisfiable: ScheduleAnyway
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/name: sentinel
+
+## Persistent Volume Claim for baselines
+persistence:
+  enabled: true
+  storageClassName: ""
+  accessMode: ReadWriteMany
+  size: 10Gi
+  annotations: {}
+
+## Environment variables
+env:
+  - name: SENTINEL_LOG_LEVEL
+    value: "info"
+  - name: SENTINEL_LOG_JSON
+    value: "true"
+  - name: RUST_BACKTRACE
+    value: "1"
+
+## ConfigMap for sentinel.yaml configuration
+config:
+  ingestion:
+    kafka:
+      brokers:
+        - "kafka-0.kafka-headless.kafka.svc.cluster.local:9092"
+        - "kafka-1.kafka-headless.kafka.svc.cluster.local:9092"
+        - "kafka-2.kafka-headless.kafka.svc.cluster.local:9092"
+      topic: "llm.telemetry"
+      groupId: "sentinel-consumer"
+      sessionTimeoutMs: 6000
+      enableAutoCommit: false
+      autoOffsetReset: "latest"
+      maxPollRecords: 500
+
+    parsing:
+      maxTextLength: 10000
+      enableSanitization: true
+      sanitizePatterns:
+        - "password"
+        - "api_key"
+        - "secret"
+
+    validation:
+      minLatencyMs: 0.1
+      maxLatencyMs: 300000.0
+      maxTokens: 100000
+      maxCostUsd: 100.0
+      enablePiiDetection: true
+
+  detection:
+    enabledDetectors:
+      - "zscore"
+      - "iqr"
+      - "mad"
+      - "cusum"
+
+    baseline:
+      windowSize: 1000
+      minSamples: 10
+      updateIntervalSecs: 60
+      enablePersistence: true
+      persistencePath: "/var/lib/sentinel/baselines"
+
+    zscore:
+      threshold: 3.0
+      sensitivity: "medium"
+      metrics:
+        - "latency_ms"
+        - "total_tokens"
+        - "cost_usd"
+
+    iqr:
+      multiplier: 1.5
+      metrics:
+        - "latency_ms"
+        - "total_tokens"
+
+    mad:
+      threshold: 3.5
+      metrics:
+        - "latency_ms"
+
+    cusum:
+      threshold: 5.0
+      drift: 0.5
+      metrics:
+        - "latency_ms"
+
+  storage:
+    influxdb:
+      url: "http://influxdb.influxdb.svc.cluster.local:8086"
+      org: "sentinel"
+      telemetryBucket: "telemetry"
+      anomalyBucket: "anomalies"
+      batchSize: 100
+      timeoutSecs: 10
+
+    cache:
+      maxCapacity: 10000
+      ttlSecs: 300
+      ttiSecs: 60
+      enableMetrics: true
+
+    redis:
+      enabled: true
+      url: "redis://redis-master.redis.svc.cluster.local:6379"
+      keyPrefix: "sentinel:"
+      ttlSecs: 300
+
+  alerting:
+    rabbitmq:
+      url: "amqp://rabbitmq.rabbitmq.svc.cluster.local:5672"
+      exchange: "sentinel.alerts"
+      exchangeType: "topic"
+      routingKeyPrefix: "alert"
+      persistent: true
+      timeoutSecs: 10
+      retryConfig:
+        maxAttempts: 3
+        initialDelayMs: 1000
+        backoffMultiplier: 2.0
+        maxDelayMs: 30000
+
+    webhook:
+      enabled: false
+      method: "POST"
+      timeoutSecs: 10
+      maxRetries: 3
+      retryDelayMs: 1000
+      backoffMultiplier: 2.0
+
+    deduplication:
+      enabled: true
+      windowSecs: 300
+      cleanupIntervalSecs: 60
+
+  api:
+    bindAddr: "0.0.0.0:8080"
+    enableCors: true
+    corsOrigins:
+      - "*"
+    timeoutSecs: 30
+    maxBodySize: 10485760
+    enableLogging: true
+    metricsPath: "/metrics"
+
+## Secrets (use external secret manager in production)
+secrets:
+  # InfluxDB token
+  influxdbToken: ""
+  # RabbitMQ credentials
+  rabbitmqUsername: "sentinel"
+  rabbitmqPassword: ""
+  # Redis password
+  redisPassword: ""
+  # Webhook secret
+  webhookSecret: ""
+
+## External secrets (if using external-secrets operator)
+externalSecrets:
+  enabled: false
+  secretStore:
+    name: aws-secrets-manager
+    kind: SecretStore
+  data:
+    - secretKey: influxdbToken
+      remoteRef:
+        key: sentinel/influxdb-token
+    - secretKey: rabbitmqPassword
+      remoteRef:
+        key: sentinel/rabbitmq-password
+    - secretKey: redisPassword
+      remoteRef:
+        key: sentinel/redis-password
+    - secretKey: webhookSecret
+      remoteRef:
+        key: sentinel/webhook-secret
+
+## ServiceMonitor for Prometheus Operator
+serviceMonitor:
+  enabled: false
+  interval: 15s
+  scrapeTimeout: 10s
+  namespace: ""
+  additionalLabels:
+    prometheus: kube-prometheus
+
+## Network Policy
+networkPolicy:
+  enabled: false
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: monitoring
+      ports:
+        - protocol: TCP
+          port: 8080
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: kafka
+      ports:
+        - protocol: TCP
+          port: 9092
+
+## Priority Class
+priorityClassName: ""
+
+## Extra labels
+extraLabels: {}
+
+## Extra volumes
+extraVolumes: []
+
+## Extra volume mounts
+extraVolumeMounts: []
+
+## Init containers
+initContainers:
+  - name: wait-for-kafka
+    image: busybox:1.36
+    command:
+      - sh
+      - -c
+      - |
+        until nc -z kafka-0.kafka-headless.kafka.svc.cluster.local 9092; do
+          echo "Waiting for Kafka..."
+          sleep 5
+        done
+        echo "Kafka is ready"
+    securityContext:
+      allowPrivilegeEscalation: false
+      runAsNonRoot: true
+      runAsUser: 1000
+      capabilities:
+        drop: ["ALL"]
+
+  - name: wait-for-influxdb
+    image: busybox:1.36
+    command:
+      - sh
+      - -c
+      - |
+        until nc -z influxdb.influxdb.svc.cluster.local 8086; do
+          echo "Waiting for InfluxDB..."
+          sleep 5
+        done
+        echo "InfluxDB is ready"
+    securityContext:
+      allowPrivilegeEscalation: false
+      runAsNonRoot: true
+      runAsUser: 1000
+      capabilities:
+        drop: ["ALL"]

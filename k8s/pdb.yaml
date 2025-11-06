@@ -1,0 +1,16 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: sentinel
+  namespace: sentinel
+  labels:
+    app: sentinel
+    app.kubernetes.io/name: sentinel
+    app.kubernetes.io/component: pdb
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: sentinel
+      app.kubernetes.io/name: sentinel
+  unhealthyPodEvictionPolicy: IfHealthyBudget

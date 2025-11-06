@@ -1,0 +1,36 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: sentinel
+  namespace: sentinel
+  labels:
+    app: sentinel
+    app.kubernetes.io/name: sentinel
+    app.kubernetes.io/component: monitoring
+    prometheus: kube-prometheus
+spec:
+  selector:
+    matchLabels:
+      app: sentinel
+      app.kubernetes.io/name: sentinel
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 15s
+      scrapeTimeout: 10s
+      scheme: http
+      relabelings:
+        - sourceLabels: [__meta_kubernetes_pod_name]
+          targetLabel: pod
+        - sourceLabels: [__meta_kubernetes_pod_node_name]
+          targetLabel: node
+        - sourceLabels: [__meta_kubernetes_namespace]
+          targetLabel: namespace
+      metricRelabelings:
+        # Drop high-cardinality metrics
+        - sourceLabels: [__name__]
+          regex: 'go_.*'
+          action: drop
+  namespaceSelector:
+    matchNames:
+      - sentinel

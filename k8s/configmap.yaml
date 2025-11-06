@@ -1,0 +1,154 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sentinel-config
+  namespace: sentinel
+  labels:
+    app: sentinel
+    app.kubernetes.io/name: sentinel
+    app.kubernetes.io/component: config
+data:
+  sentinel.yaml: |
+    # LLM-Sentinel Kubernetes Configuration
+
+    server:
+      environment: "production"
+      log_level: "info"
+      log_format: "json"
+      metrics_port: 9090
+
+    ingestion:
+      kafka:
+        brokers:
+          - "kafka-0.kafka-headless.kafka.svc.cluster.local:9092"
+          - "kafka-1.kafka-headless.kafka.svc.cluster.local:9092"
+          - "kafka-2.kafka-headless.kafka.svc.cluster.local:9092"
+        topic: "llm.telemetry"
+        group_id: "sentinel-consumer"
+        session_timeout_ms: 6000
+        enable_auto_commit: false
+        auto_offset_reset: "latest"
+        max_poll_records: 500
+        fetch_min_bytes: 1024
+        fetch_max_wait_ms: 500
+
+      parsing:
+        max_text_length: 10000
+        enable_sanitization: true
+        sanitize_patterns:
+          - "password"
+          - "api_key"
+          - "secret"
+          - "token"
+
+      validation:
+        min_latency_ms: 0.1
+        max_latency_ms: 300000.0
+        max_tokens: 100000
+        max_cost_usd: 100.0
+        enable_pii_detection: true
+
+    detection:
+      enabled_detectors:
+        - "zscore"
+        - "iqr"
+        - "mad"
+        - "cusum"
+
+      baseline:
+        window_size: 1000
+        min_samples: 10
+        update_interval_secs: 60
+        enable_persistence: true
+        persistence_path: "/var/lib/sentinel/baselines"
+
+      zscore:
+        threshold: 3.0
+        sensitivity: "medium"
+        metrics:
+          - "latency_ms"
+          - "total_tokens"
+          - "cost_usd"
+
+      iqr:
+        multiplier: 1.5
+        metrics:
+          - "latency_ms"
+          - "total_tokens"
+
+      mad:
+        threshold: 3.5
+        metrics:
+          - "latency_ms"
+
+      cusum:
+        threshold: 5.0
+        drift: 0.5
+        metrics:
+          - "latency_ms"
+
+    storage:
+      influxdb:
+        url: "http://influxdb.influxdb.svc.cluster.local:8086"
+        org: "sentinel"
+        telemetry_bucket: "telemetry"
+        anomaly_bucket: "anomalies"
+        batch_size: 100
+        timeout_secs: 10
+
+      cache:
+        max_capacity: 10000
+        ttl_secs: 300
+        tti_secs: 60
+        enable_metrics: true
+
+      redis:
+        enabled: true
+        url: "redis://redis-master.redis.svc.cluster.local:6379"
+        key_prefix: "sentinel:"
+        ttl_secs: 300
+
+    alerting:
+      rabbitmq:
+        url: "amqp://rabbitmq.rabbitmq.svc.cluster.local:5672"
+        exchange: "sentinel.alerts"
+        exchange_type: "topic"
+        routing_key_prefix: "alert"
+        persistent: true
+        timeout_secs: 10
+        retry_config:
+          max_attempts: 3
+          initial_delay_ms: 1000
+          backoff_multiplier: 2.0
+          max_delay_ms: 30000
+
+      webhook:
+        enabled: false
+        method: "POST"
+        timeout_secs: 10
+        max_retries: 3
+        retry_delay_ms: 1000
+        backoff_multiplier: 2.0
+
+      deduplication:
+        enabled: true
+        window_secs: 300
+        cleanup_interval_secs: 60
+
+    api:
+      bind_addr: "0.0.0.0:8080"
+      enable_cors: true
+      cors_origins:
+        - "*"
+      timeout_secs: 30
+      max_body_size: 10485760
+      enable_logging: true
+      metrics_path: "/metrics"
+
+    advanced:
+      worker_threads: 4
+      blocking_threads: 16
+      ingestion_buffer_size: 10000
+      detection_buffer_size: 1000
+      enable_cpu_profiling: false
+      enable_memory_profiling: false

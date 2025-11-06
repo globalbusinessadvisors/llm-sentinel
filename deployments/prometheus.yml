@@ -1,0 +1,82 @@
+# Prometheus configuration for LLM-Sentinel
+
+global:
+  scrape_interval: 15s
+  scrape_timeout: 10s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'sentinel-dev'
+    environment: 'development'
+
+# Alerting configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+# Rule files
+rule_files:
+  - 'alerts/sentinel-alerts.yaml'
+
+# Scrape configurations
+scrape_configs:
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+        labels:
+          service: 'prometheus'
+
+  # LLM-Sentinel metrics
+  - job_name: 'sentinel'
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+    static_configs:
+      - targets: ['sentinel:8080']
+        labels:
+          service: 'sentinel'
+          component: 'core'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: sentinel:8080
+
+  # Kafka exporter (optional)
+  - job_name: 'kafka'
+    static_configs:
+      - targets: []
+        labels:
+          service: 'kafka'
+
+  # InfluxDB metrics (optional)
+  - job_name: 'influxdb'
+    static_configs:
+      - targets: ['influxdb:8086']
+        labels:
+          service: 'influxdb'
+
+  # RabbitMQ metrics (optional)
+  - job_name: 'rabbitmq'
+    static_configs:
+      - targets: ['rabbitmq:15692']
+        labels:
+          service: 'rabbitmq'
+
+  # Redis metrics (optional)
+  - job_name: 'redis'
+    static_configs:
+      - targets: []
+        labels:
+          service: 'redis'
+
+# Remote write configuration (optional)
+# remote_write:
+#   - url: "https://prometheus-remote-write-endpoint/api/v1/write"
+#     basic_auth:
+#       username: "user"
+#       password: "pass"

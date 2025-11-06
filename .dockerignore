@@ -1,0 +1,54 @@
+# Build artifacts
+target/
+**/*.rs.bk
+*.pdb
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Documentation
+*.md
+!README.md
+docs/
+.github/
+*.txt
+
+# CI/CD
+.gitlab-ci.yml
+.travis.yml
+azure-pipelines.yml
+
+# Tests
+tests/
+benches/
+examples/
+
+# Local development
+.env
+.env.*
+*.log
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Kubernetes
+k8s/
+deployments/
+helm/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
