@@ -1,0 +1,182 @@
+name: Build and Publish NPM Packages
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish (e.g., 0.1.2)'
+        required: true
+        default: '0.1.2'
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build-and-publish:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux-x64
+            target: x86_64-unknown-linux-gnu
+            binary: sentinel
+          - os: ubuntu-latest
+            platform: linux-arm64
+            target: aarch64-unknown-linux-gnu
+            binary: sentinel
+          - os: macos-13
+            platform: darwin-x64
+            target: x86_64-apple-darwin
+            binary: sentinel
+          - os: macos-latest
+            platform: darwin-arm64
+            target: aarch64-apple-darwin
+            binary: sentinel
+          - os: windows-latest
+            platform: win32-x64
+            target: x86_64-pc-windows-msvc
+            binary: sentinel.exe
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Install cross-compilation tools (Linux ARM64)
+        if: matrix.platform == 'linux-arm64'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu
+
+      - name: Build binary
+        run: cargo build --release --target ${{ matrix.target }} --bin sentinel
+
+      - name: Create NPM package directory
+        shell: bash
+        run: |
+          mkdir -p npm-platform-packages/cli-${{ matrix.platform }}/bin
+          cp target/${{ matrix.target }}/release/${{ matrix.binary }} npm-platform-packages/cli-${{ matrix.platform }}/bin/
+
+      - name: Create package.json
+        shell: bash
+        run: |
+          OS="${{ matrix.platform }}"
+          OS_NAME="${OS%%-*}"
+          CPU_NAME="${OS##*-}"
+
+          cat > npm-platform-packages/cli-${{ matrix.platform }}/package.json <<EOF
+          {
+            "name": "@llm-dev-ops/sentinel-cli-${{ matrix.platform }}",
+            "version": "${{ github.event.inputs.version }}",
+            "description": "LLM Sentinel CLI - ${{ matrix.platform }} binary",
+            "os": ["$OS_NAME"],
+            "cpu": ["$CPU_NAME"],
+            "license": "Apache-2.0",
+            "repository": {
+              "type": "git",
+              "url": "https://github.com/globalbusinessadvisors/llm-sentinel.git"
+            },
+            "homepage": "https://github.com/globalbusinessadvisors/llm-sentinel",
+            "author": "LLM DevOps Team <noreply@llm-sentinel.dev>",
+            "files": ["bin/"],
+            "publishConfig": {
+              "access": "public"
+            }
+          }
+          EOF
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Publish platform package
+        working-directory: npm-platform-packages/cli-${{ matrix.platform }}
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  publish-main:
+    needs: build-and-publish
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Update package.json version and dependencies
+        run: |
+          cat > package.json <<EOF
+          {
+            "name": "@llm-dev-ops/sentinel-cli",
+            "version": "${{ github.event.inputs.version }}",
+            "description": "Enterprise-grade anomaly detection and observability platform for LLM applications - NPM CLI wrapper",
+            "keywords": [
+              "llm",
+              "anomaly-detection",
+              "observability",
+              "monitoring",
+              "sentinel",
+              "rust",
+              "cli"
+            ],
+            "repository": {
+              "type": "git",
+              "url": "https://github.com/globalbusinessadvisors/llm-sentinel.git"
+            },
+            "homepage": "https://github.com/globalbusinessadvisors/llm-sentinel",
+            "license": "Apache-2.0",
+            "author": "LLM DevOps Team <noreply@llm-sentinel.dev>",
+            "bin": {
+              "sentinel": "./bin/cli.js",
+              "llm-sentinel": "./bin/cli.js"
+            },
+            "main": "./lib/index.js",
+            "types": "./lib/index.d.ts",
+            "files": [
+              "bin/",
+              "lib/",
+              "README.md",
+              "LICENSE"
+            ],
+            "scripts": {
+              "postinstall": "node ./lib/install.js",
+              "test": "node ./lib/test.js",
+              "prepare": "node ./lib/prepare.js"
+            },
+            "engines": {
+              "node": ">=14.0.0"
+            },
+            "optionalDependencies": {
+              "@llm-dev-ops/sentinel-cli-darwin-x64": "${{ github.event.inputs.version }}",
+              "@llm-dev-ops/sentinel-cli-darwin-arm64": "${{ github.event.inputs.version }}",
+              "@llm-dev-ops/sentinel-cli-linux-x64": "${{ github.event.inputs.version }}",
+              "@llm-dev-ops/sentinel-cli-linux-arm64": "${{ github.event.inputs.version }}",
+              "@llm-dev-ops/sentinel-cli-win32-x64": "${{ github.event.inputs.version }}"
+            },
+            "publishConfig": {
+              "access": "public"
+            }
+          }
+          EOF
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Wait for platform packages to be available
+        run: sleep 60
+
+      - name: Publish main package
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
