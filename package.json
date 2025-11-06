@@ -1,6 +1,6 @@
 {
   "name": "@llm-dev-ops/sentinel-cli",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Enterprise-grade anomaly detection and observability platform for LLM applications - NPM CLI wrapper",
   "keywords": [
     "llm",
@@ -39,9 +39,10 @@
     "node": ">=14.0.0"
   },
   "optionalDependencies": {
-    "@llm-dev-ops/sentinel-cli-darwin-x64": "0.1.2",
-    "@llm-dev-ops/sentinel-cli-darwin-arm64": "0.1.2",
-    "@llm-dev-ops/sentinel-cli-linux-x64": "0.1.2"
+    "@llm-dev-ops/sentinel-cli-darwin-x64": "0.1.3",
+    "@llm-dev-ops/sentinel-cli-darwin-arm64": "0.1.3",
+    "@llm-dev-ops/sentinel-cli-linux-x64": "0.1.3",
+    "@llm-dev-ops/sentinel-cli-win32-x64": "0.1.3"
   },
   "devDependencies": {},
   "publishConfig": {
