@@ -7,6 +7,10 @@ authors.workspace = true
 license.workspace = true
 repository.workspace = true
 homepage.workspace = true
+description = "REST API server with health checks, Prometheus metrics, and query endpoints for LLM-Sentinel"
+keywords = ["api", "rest", "prometheus", "metrics", "llm"]
+categories = ["web-programming", "asynchronous"]
+readme = "README.md"
 
 [dependencies]
 # Internal

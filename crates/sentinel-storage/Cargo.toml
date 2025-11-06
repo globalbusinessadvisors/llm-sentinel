@@ -7,6 +7,10 @@ authors.workspace = true
 license.workspace = true
 repository.workspace = true
 homepage.workspace = true
+description = "InfluxDB time-series storage and multi-layer caching (Moka + Redis) for LLM-Sentinel"
+keywords = ["influxdb", "cache", "redis", "storage", "timeseries"]
+categories = ["database", "caching"]
+readme = "README.md"
 
 [dependencies]
 # Internal

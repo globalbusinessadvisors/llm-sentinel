@@ -7,6 +7,10 @@ authors.workspace = true
 license.workspace = true
 repository.workspace = true
 homepage.workspace = true
+description = "Enterprise-grade anomaly detection and observability platform for LLM applications"
+keywords = ["llm", "anomaly-detection", "observability", "monitoring", "rust"]
+categories = ["command-line-utilities", "development-tools"]
+readme = "README.md"
 
 [[bin]]
 name = "sentinel"

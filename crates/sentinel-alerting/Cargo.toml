@@ -7,6 +7,10 @@ authors.workspace = true
 license.workspace = true
 repository.workspace = true
 homepage.workspace = true
+description = "RabbitMQ and webhook alerting with deduplication for LLM-Sentinel anomaly detection"
+keywords = ["rabbitmq", "webhooks", "alerting", "notifications", "llm"]
+categories = ["asynchronous", "web-programming"]
+readme = "README.md"
 
 [dependencies]
 # Internal

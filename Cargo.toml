@@ -14,10 +14,14 @@ resolver = "2"
 version = "0.1.0"
 edition = "2021"
 rust-version = "1.75"
-authors = ["LLM DevOps Team"]
+authors = ["LLM DevOps Team <noreply@llm-sentinel.dev>"]
 license = "Apache-2.0"
-repository = "https://github.com/llm-devops/llm-sentinel"
-homepage = "https://llm-devops.io/sentinel"
+repository = "https://github.com/globalbusinessadvisors/llm-sentinel"
+homepage = "https://github.com/globalbusinessadvisors/llm-sentinel"
+documentation = "https://docs.rs/sentinel-core"
+readme = "README.md"
+keywords = ["llm", "anomaly-detection", "observability", "monitoring"]
+categories = ["development-tools", "web-programming"]
 
 [workspace.dependencies]
 # Async Runtime & Concurrency

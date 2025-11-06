@@ -7,6 +7,10 @@ authors.workspace = true
 license.workspace = true
 repository.workspace = true
 homepage.workspace = true
+description = "Multi-algorithm anomaly detection engine (Z-Score, IQR, MAD, CUSUM) for LLM telemetry"
+keywords = ["anomaly-detection", "statistics", "detection", "llm", "monitoring"]
+categories = ["algorithms", "science"]
+readme = "README.md"
 
 [dependencies]
 # Internal

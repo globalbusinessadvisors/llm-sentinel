@@ -7,6 +7,10 @@ authors.workspace = true
 license.workspace = true
 repository.workspace = true
 homepage.workspace = true
+description = "Core types, error handling, and configuration for LLM-Sentinel anomaly detection system"
+keywords = ["llm", "anomaly-detection", "monitoring", "observability", "telemetry"]
+categories = ["development-tools", "web-programming"]
+readme = "README.md"
 
 [dependencies]
 # Async

@@ -7,6 +7,10 @@ authors.workspace = true
 license.workspace = true
 repository.workspace = true
 homepage.workspace = true
+description = "Kafka ingestion, OTLP parsing, and telemetry validation for LLM-Sentinel"
+keywords = ["kafka", "telemetry", "otlp", "ingestion", "llm"]
+categories = ["asynchronous", "web-programming"]
+readme = "README.md"
 
 [dependencies]
 # Internal
