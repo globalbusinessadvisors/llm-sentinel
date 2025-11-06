@@ -1,6 +1,7 @@
 //! HTTP middleware for logging, CORS, and error handling.
 
 use axum::{
+    body::Body,
     http::{header, Method, Request, StatusCode},
     middleware::Next,
     response::{IntoResponse, Response},
@@ -30,7 +31,7 @@ pub fn cors_middleware(origins: Vec<String>) -> CorsLayer {
 
 /// Request logging middleware
 pub async fn logging_middleware(
-    req: Request,
+    req: Request<Body>,
     next: Next,
 ) -> Result<Response, StatusCode> {
     let method = req.method().clone();
@@ -47,7 +48,7 @@ pub async fn logging_middleware(
 
 /// Error handling middleware
 pub async fn error_handling_middleware(
-    req: Request,
+    req: Request<Body>,
     next: Next,
 ) -> impl IntoResponse {
     let response = next.run(req).await;
