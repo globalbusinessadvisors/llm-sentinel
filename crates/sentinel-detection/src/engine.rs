@@ -228,9 +228,10 @@ impl DetectionEngine {
                         error = %e,
                         "Detector error"
                     );
+                    let detector_name = detector.name().to_string();
                     metrics::counter!(
                         "sentinel_detection_errors_total",
-                        "detector" => detector.name()
+                        "detector" => detector_name
                     )
                     .increment(1);
                     // Continue with other detectors
