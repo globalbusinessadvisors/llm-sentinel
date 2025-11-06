@@ -1,6 +1,6 @@
 //! RabbitMQ alert publisher with severity-based routing.
 
-use crate::{AlertConfig, Alerter};
+use crate::Alerter;
 use async_trait::async_trait;
 use lapin::{
     options::*, types::FieldTable, BasicProperties, Channel, Connection, ConnectionProperties,
@@ -83,9 +83,7 @@ impl RabbitMqAlerter {
         let connection = Connection::connect(
             &config.url,
             ConnectionProperties::default()
-                .with_connection_name("sentinel-alerter".into())
-                .with_executor(tokio_executor_trait::Tokio::current())
-                .with_reactor(tokio_reactor_trait::Tokio),
+                .with_connection_name("sentinel-alerter".into()),
         )
         .await
         .map_err(|e| {
@@ -151,7 +149,7 @@ impl RabbitMqAlerter {
     async fn publish_with_retry(&self, alert: &AnomalyEvent) -> Result<()> {
         let routing_key = self.build_routing_key(alert.severity);
         let payload = serde_json::to_vec(alert)
-            .map_err(|e| Error::serialization(format!("Failed to serialize alert: {}", e)))?;
+            .map_err(|e| Error::internal(format!("Failed to serialize alert: {}", e)))?;
 
         let properties = BasicProperties::default()
             .with_delivery_mode(if self.config.persistent { 2 } else { 1 })

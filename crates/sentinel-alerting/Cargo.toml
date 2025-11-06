@@ -44,6 +44,9 @@ chrono = { workspace = true }
 # Utilities
 uuid = { workspace = true }
 once_cell = { workspace = true }
+hmac = { workspace = true }
+sha2 = { workspace = true }
+hex = { workspace = true }
 
 # Collections
 dashmap = { workspace = true }

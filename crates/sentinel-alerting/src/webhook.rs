@@ -1,6 +1,6 @@
 //! Webhook alert delivery for HTTP-based notifications.
 
-use crate::{AlertConfig, Alerter};
+use crate::Alerter;
 use async_trait::async_trait;
 use reqwest::{Client, StatusCode};
 use llm_sentinel_core::{events::AnomalyEvent, Error, Result};
@@ -115,7 +115,7 @@ impl WebhookAlerter {
         };
 
         let payload_json = serde_json::to_string(&payload).map_err(|e| {
-            Error::serialization(format!("Failed to serialize webhook payload: {}", e))
+            Error::internal(format!("Failed to serialize webhook payload: {}", e))
         })?;
 
         // Generate signature if secret is configured
@@ -124,7 +124,7 @@ impl WebhookAlerter {
         }
 
         let final_payload = serde_json::to_string(&payload).map_err(|e| {
-            Error::serialization(format!("Failed to serialize webhook payload: {}", e))
+            Error::internal(format!("Failed to serialize webhook payload: {}", e))
         })?;
 
         let mut attempt = 0;

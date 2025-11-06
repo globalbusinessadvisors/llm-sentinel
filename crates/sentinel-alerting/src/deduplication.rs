@@ -5,12 +5,11 @@ use dashmap::DashMap;
 use llm_sentinel_core::{
     events::AnomalyEvent,
     types::{AnomalyType, ModelId, ServiceId, Severity},
-    Result,
 };
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use std::time::Duration;
-use tracing::{debug, info, warn};
+use tracing::{debug, info};
 
 /// Configuration for alert deduplication
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -38,8 +37,8 @@ impl Default for DeduplicationConfig {
 pub struct DeduplicationKey {
     pub service: ServiceId,
     pub model: ModelId,
-    pub anomaly_type: AnomalyType,
-    pub severity: Severity,
+    pub anomaly_type: String,
+    pub severity: String,
 }
 
 impl DeduplicationKey {
@@ -48,8 +47,8 @@ impl DeduplicationKey {
         Self {
             service: event.service_name.clone(),
             model: event.model.clone(),
-            anomaly_type: event.anomaly_type,
-            severity: event.severity,
+            anomaly_type: event.anomaly_type.to_string(),
+            severity: event.severity.to_string(),
         }
     }
 }
@@ -229,7 +228,7 @@ pub struct DeduplicationStats {
     /// Total alerts deduplicated
     pub total_deduplicated: u64,
     /// Deduplicated count by severity
-    pub by_severity: std::collections::HashMap<Severity, u64>,
+    pub by_severity: std::collections::HashMap<String, u64>,
 }
 
 impl DeduplicationStats {
