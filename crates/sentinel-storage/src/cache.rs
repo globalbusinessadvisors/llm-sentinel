@@ -40,6 +40,19 @@ where
     config: CacheConfig,
 }
 
+impl<K, V> std::fmt::Debug for BaselineCache<K, V>
+where
+    K: std::hash::Hash + Eq + Send + Sync + Clone + 'static,
+    V: Clone + Send + Sync + 'static,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("BaselineCache")
+            .field("config", &self.config)
+            .field("entry_count", &self.cache.entry_count())
+            .finish()
+    }
+}
+
 impl<K, V> BaselineCache<K, V>
 where
     K: std::hash::Hash + Eq + Send + Sync + Clone + 'static,
@@ -138,6 +151,14 @@ pub struct RedisCache {
     config: RedisCacheConfig,
 }
 
+impl std::fmt::Debug for RedisCache {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("RedisCache")
+            .field("config", &self.config)
+            .finish()
+    }
+}
+
 /// Redis cache configuration
 #[derive(Debug, Clone)]
 pub struct RedisCacheConfig {
@@ -234,7 +255,7 @@ impl RedisCache {
             .arg(&full_key)
             .arg(self.config.ttl_secs)
             .arg(&json)
-            .query_async(&mut conn)
+            .query_async::<()>(&mut conn)
             .await
             .map_err(|e| Error::storage(format!("Redis SETEX failed: {}", e)))?;
 
@@ -251,7 +272,7 @@ impl RedisCache {
         let full_key = self.build_key(key);
         redis::cmd("DEL")
             .arg(&full_key)
-            .query_async(&mut conn)
+            .query_async::<()>(&mut conn)
             .await
             .map_err(|e| Error::storage(format!("Redis DEL failed: {}", e)))?;
 

@@ -49,6 +49,14 @@ pub struct InfluxDbStorage {
     config: InfluxDbConfig,
 }
 
+impl std::fmt::Debug for InfluxDbStorage {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("InfluxDbStorage")
+            .field("config", &self.config)
+            .finish()
+    }
+}
+
 impl InfluxDbStorage {
     /// Create a new InfluxDB storage backend
     pub async fn new(config: InfluxDbConfig) -> Result<Self> {
